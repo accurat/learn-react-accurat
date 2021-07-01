@@ -29,9 +29,20 @@ function App() {
       })
   }, [])
 
+  const margins = {
+    top: 10,
+    left: 10,
+    right: 10,
+    bottom: 10,
+  }
+
   const xScale = d3.scaleLinear()
-    .range([0, 500])
+    .range([0 + margins.left, 500 - margins.right])
     .domain(d3.extent(dataset.map(d => d['Beak Length (mm)'])))
+
+  const yScale = d3.scaleLinear()
+    .range([500 - margins.bottom, 0 + margins.top])
+    .domain(d3.extent(dataset.map(d => d['Flipper Length (mm)'])))
 
   return (
     <div>
@@ -39,15 +50,17 @@ function App() {
       ? (<div>L O A D I N G . . .</div>)
       : (
         <svg width={500} height={500}>
-          <rect fill="lightgreen" width={500} height={500} />
+          <rect fill="aliceblue" width={500} height={500} />
 
           {dataset.map((datum, i) =>
-            <circle
-              key={i}
-              r={5}
-              cx={xScale(datum['Beak Length (mm)'])}
-              cy={datum['Flipper Length (mm)']}
-            />
+            <g key={i}>
+              <circle
+                r={5}
+                cx={xScale(datum['Beak Length (mm)'])}
+                cy={yScale(datum['Flipper Length (mm)'])}
+                fill="steelblue"
+              />
+            </g>
           )}
         </svg>
       )}
