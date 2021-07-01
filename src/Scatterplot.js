@@ -41,11 +41,13 @@ export function Scatterplot() {
     .scaleLinear()
     .range([0 + margins.left, 500 - margins.right])
     .domain(d3.extent(dataset.map((d) => d['Beak Length (mm)'])))
+    .nice(5)
 
   const yScale = d3
     .scaleLinear()
     .range([500 - margins.bottom, 0 + margins.top])
     .domain(d3.extent(dataset.map((d) => d['Flipper Length (mm)'])))
+    .nice(5)
 
   const species = uniq(dataset.map((d) => d['Species']))
   const colors = ['tomato', 'steelblue', 'green']
@@ -75,6 +77,23 @@ export function Scatterplot() {
                 />
               </g>
             ))}
+
+          {xScale.ticks(10).map((tick) => (
+            <g>
+              <text x={xScale(tick)} y={yScale.range()[0]} fontSize={9}>
+                {tick}
+              </text>
+              <circle r={2} cx={xScale(tick)} cy={yScale.range()[0]} />
+            </g>
+          ))}
+          {yScale.ticks(10).map((tick) => (
+            <g>
+              <text x={xScale.range()[0]} y={yScale(tick)} fontSize={9}>
+                {tick}
+              </text>
+              <circle r={2} cx={xScale.range()[0]} cy={yScale(tick)} />
+            </g>
+          ))}
         </svg>
       )}
     </div>
