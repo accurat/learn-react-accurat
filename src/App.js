@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
+import * as d3 from 'd3'
 
 const URL = 'https://raw.githubusercontent.com/vega/vega-datasets/master/data/penguins.json'
 
 function App() {
   const [isLoading, setIsLoading] = useState(false)
-  const [dataset, setDataset] = useState(null)
-
-  console.log(dataset, isLoading)
+  const [dataset, setDataset] = useState([])
 
   useEffect(() => {
     setIsLoading(true)
@@ -23,11 +22,28 @@ function App() {
       })
   }, [])
 
+  const xScale = d3.scaleLinear()
+    .range([0, 500])
+    .domain(d3.extent(dataset.map(d => d['Beak Length (mm)'])))
+
   return (
     <div>
-      <svg>
+      {isLoading
+      ? (<div>L O A D I N G . . .</div>)
+      : (
+        <svg width={500} height={500}>
+          <rect fill="lightgreen" width={500} height={500} />
 
-      </svg>
+          {dataset.map((datum, i) =>
+            <circle
+              key={i}
+              r={5}
+              cx={xScale(datum['Beak Length (mm)'])}
+              cy={datum['Flipper Length (mm)']}
+            />
+          )}
+        </svg>
+      )}
     </div>
   );
 }
