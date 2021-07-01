@@ -8,6 +8,13 @@ function App() {
   const [dataset, setDataset] = useState([])
 
   useEffect(() => {
+    if (dataset.length === 0) return
+
+    console.table(dataset.slice(0, 10))
+    console.log(d3.extent(dataset.map(d => d['Beak Length (mm)'])))
+  }, [dataset])
+
+  useEffect(() => {
     setIsLoading(true)
     fetch(URL)
       .then((response) => response.json())
