@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import * as d3 from 'd3'
+import { uniq, zipObject } from 'lodash'
 
 const URL = 'https://raw.githubusercontent.com/vega/vega-datasets/master/data/penguins.json'
 
@@ -44,6 +45,14 @@ function App() {
     .range([500 - margins.bottom, 0 + margins.top])
     .domain(d3.extent(dataset.map(d => d['Flipper Length (mm)'])))
 
+  const species = uniq(dataset.map(d => d['Species']))
+  const colors = ['tomato', 'steelblue', 'green']
+  const speciesColorsTranslation = zipObject(species, colors)
+
+  const colorScale = (specie) => {
+    return speciesColorsTranslation[specie]
+  }
+
   return (
     <div>
       {isLoading
@@ -63,7 +72,7 @@ function App() {
                   r={5}
                   cx={xScale(datum['Beak Length (mm)'])}
                   cy={yScale(datum['Flipper Length (mm)'])}
-                  fill="steelblue"
+                  fill={colorScale(datum['Species'])}
                 />
               </g>
             )
