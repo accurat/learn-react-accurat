@@ -52,16 +52,22 @@ function App() {
         <svg width={500} height={500}>
           <rect fill="aliceblue" width={500} height={500} />
 
-          {dataset.map((datum, i) =>
-            <g key={i}>
-              <circle
-                r={5}
-                cx={xScale(datum['Beak Length (mm)'])}
-                cy={yScale(datum['Flipper Length (mm)'])}
-                fill="steelblue"
-              />
-            </g>
-          )}
+          {dataset
+            .filter(d =>
+              d['Beak Length (mm)'] !== null &&
+              d['Flipper Length (mm)'] !== null
+            )
+            .map((datum, i) =>
+              <g key={i}>
+                <circle
+                  r={5}
+                  cx={xScale(datum['Beak Length (mm)'])}
+                  cy={yScale(datum['Flipper Length (mm)'])}
+                  fill="steelblue"
+                />
+              </g>
+            )
+          }
         </svg>
       )}
     </div>
