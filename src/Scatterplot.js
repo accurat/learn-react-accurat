@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import * as d3 from 'd3'
-import { uniq, zipObject } from 'lodash'
 
 const URL = 'https://raw.githubusercontent.com/vega/vega-datasets/master/data/penguins.json'
 
@@ -11,7 +10,7 @@ export function Scatterplot() {
   useEffect(() => {
     if (dataset.length === 0) return
 
-    console.table(dataset.slice(0, 10))
+    console.table(dataset)
     console.log(d3.extent(dataset.map((d) => d['Beak Length (mm)'])))
   }, [dataset])
 
@@ -39,23 +38,17 @@ export function Scatterplot() {
 
   const xScale = d3
     .scaleLinear()
-    .range([0 + margins.left, 500 - margins.right])
     .domain(d3.extent(dataset.map((d) => d['Beak Length (mm)'])))
+    .range([0 + margins.left, 500 - margins.right])
     .nice(5)
 
   const yScale = d3
     .scaleLinear()
-    .range([500 - margins.bottom, 0 + margins.top])
     .domain(d3.extent(dataset.map((d) => d['Flipper Length (mm)'])))
+    .range([500 - margins.bottom, 0 + margins.top])
     .nice(5)
 
-  const species = uniq(dataset.map((d) => d['Species']))
-  const colors = ['tomato', 'steelblue', 'green']
-  const speciesColorsTranslation = zipObject(species, colors)
-
-  const colorScale = (specie) => {
-    return speciesColorsTranslation[specie]
-  }
+  const colorScale = d3.scaleOrdinal().range(['tomato', 'steelblue', 'green'])
 
   return (
     <div>
