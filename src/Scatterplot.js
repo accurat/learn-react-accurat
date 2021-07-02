@@ -30,10 +30,10 @@ export function Scatterplot() {
   }, [])
 
   const margins = {
-    top: 10,
-    left: 10,
-    right: 10,
-    bottom: 10,
+    top: 20,
+    left: 30,
+    right: 20,
+    bottom: 20,
   }
 
   const xScale = d3
@@ -72,19 +72,65 @@ export function Scatterplot() {
             ))}
 
           {xScale.ticks(10).map((tick) => (
-            <g>
-              <text x={xScale(tick)} y={yScale.range()[0]} fontSize={9}>
+            <g key={tick}>
+              <text
+                x={xScale(tick)}
+                y={yScale.range()[0] + 5}
+                fontSize={9}
+                textAnchor="middle"
+                dominantBaseline="hanging"
+              >
                 {tick}
               </text>
-              <circle r={2} cx={xScale(tick)} cy={yScale.range()[0]} />
+              <line
+                x1={xScale(tick)}
+                y1={yScale.range()[0]}
+                x2={xScale(tick)}
+                y2={yScale.range()[0] - 5}
+                stroke="black"
+              />
             </g>
           ))}
+
           {yScale.ticks(10).map((tick) => (
-            <g>
-              <text x={xScale.range()[0]} y={yScale(tick)} fontSize={9}>
+            <g key={tick}>
+              <text
+                x={xScale.range()[0] - 5}
+                y={yScale(tick)}
+                fontSize={9}
+                textAnchor="end"
+                dominantBaseline="middle"
+              >
                 {tick}
               </text>
-              <circle r={2} cx={xScale.range()[0]} cy={yScale(tick)} />
+              <line
+                x1={xScale.range()[0] + 5}
+                y1={yScale(tick)}
+                x2={xScale.range()[0]}
+                y2={yScale(tick)}
+                stroke="black"
+              />
+            </g>
+          ))}
+
+          {/* Fixes the "L" shape between ticks at the origin */}
+          <rect x={xScale.range()[0] - 0.5} y={yScale.range()[0] - 0.5} width={1} height={1} />
+
+          <rect
+            x={395}
+            y={0}
+            width={500 - 400}
+            height={70}
+            fill="white"
+            fillOpacity="0.5"
+            stroke="gray"
+          />
+          {colorScale.domain().map((singleSpecies, i) => (
+            <g key={singleSpecies}>
+              <text x={420} y={20 + 20 * i}>
+                {singleSpecies}
+              </text>
+              <circle r={5} cx={410} cy={15 + 20 * i} fill={colorScale(singleSpecies)} />
             </g>
           ))}
         </svg>
