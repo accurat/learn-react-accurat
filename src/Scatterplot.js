@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react'
 import * as d3 from 'd3'
+import { uniq, zipObject } from 'lodash'
 
 const URL = 'https://raw.githubusercontent.com/vega/vega-datasets/master/data/penguins.json'
 
 export function Scatterplot() {
   const [isLoading, setIsLoading] = useState(false)
   const [dataset, setDataset] = useState([])
+  const [filterOnSpecies, setFilterOnSpecies] = useState({})
+
+  const toggleFilterOnSpecies = (category) => {
+    const oldCategoryValue = filterOnSpecies[category]
+    setFilterOnSpecies({ ...filterOnSpecies, [category]: !oldCategoryValue })
+  }
 
   useEffect(() => {
     if (dataset.length === 0) return
@@ -20,6 +27,14 @@ export function Scatterplot() {
       .then((response) => response.json())
       .then((json) => {
         setDataset(json)
+
+        const species = uniq(json.map((d) => d['Species']))
+        setFilterOnSpecies(
+          zipObject(
+            species,
+            species.map(() => true)
+          )
+        )
       })
       .catch(() => {
         window.alert('Errore!')
@@ -48,7 +63,10 @@ export function Scatterplot() {
     .range([500 - margins.bottom, 0 + margins.top])
     .nice(5)
 
-  const colorScale = d3.scaleOrdinal().range(['tomato', 'steelblue', 'green'])
+  const colorScale = d3
+    .scaleOrdinal()
+    .range(['tomato', 'steelblue', 'green'])
+    .domain(uniq(dataset.map((d) => d['Species'])))
 
   return (
     <div>
@@ -60,6 +78,7 @@ export function Scatterplot() {
 
           {dataset
             .filter((d) => d['Beak Length (mm)'] !== null && d['Flipper Length (mm)'] !== null)
+            .filter((d) => filterOnSpecies[d['Species']] === true)
             .map((datum, i) => (
               <g key={i}>
                 <circle
@@ -116,14 +135,21 @@ export function Scatterplot() {
           {/* Fixes the "L" shape between ticks at the origin */}
           <rect x={xScale.range()[0] - 0.5} y={yScale.range()[0] - 0.5} width={1} height={1} />
 
-          <Legend scale={colorScale} x={390} y={5} />
+          <Legend
+            scale={colorScale}
+            x={390}
+            y={5}
+            onCategoryClick={(category) => {
+              toggleFilterOnSpecies(category)
+            }}
+          />
         </svg>
       )}
     </div>
   )
 }
 
-function Legend({ scale, x, y }) {
+function Legend({ scale, x, y, onCategoryClick }) {
   return (
     <g className="-legend">
       <rect x={x} y={y} width={105} height={70} fill="white" fillOpacity="0.5" stroke="gray" />
@@ -133,7 +159,18 @@ function Legend({ scale, x, y }) {
           <text x={x + 25} y={y + 16 + 20 * i} dominantBaseline="middle" fontSize={12}>
             {category}
           </text>
-          <circle r={5} cx={x + 15} cy={y + 15 + 20 * i} fill={scale(category)} />
+          <circle
+            r={5}
+            cx={x + 15}
+            cy={y + 15 + 20 * i}
+            fill={scale(category)}
+            onClick={() => {
+              onCategoryClick(category)
+            }}
+            style={{
+              cursor: 'pointer',
+            }}
+          />
         </g>
       ))}
     </g>
