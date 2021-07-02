@@ -116,25 +116,26 @@ export function Scatterplot() {
           {/* Fixes the "L" shape between ticks at the origin */}
           <rect x={xScale.range()[0] - 0.5} y={yScale.range()[0] - 0.5} width={1} height={1} />
 
-          <rect
-            x={395}
-            y={0}
-            width={500 - 400}
-            height={70}
-            fill="white"
-            fillOpacity="0.5"
-            stroke="gray"
-          />
-          {colorScale.domain().map((singleSpecies, i) => (
-            <g key={singleSpecies}>
-              <text x={420} y={20 + 20 * i}>
-                {singleSpecies}
-              </text>
-              <circle r={5} cx={410} cy={15 + 20 * i} fill={colorScale(singleSpecies)} />
-            </g>
-          ))}
+          <Legend scale={colorScale} x={390} y={5} />
         </svg>
       )}
     </div>
+  )
+}
+
+function Legend({ scale, x, y }) {
+  return (
+    <g className="-legend">
+      <rect x={x} y={y} width={105} height={70} fill="white" fillOpacity="0.5" stroke="gray" />
+
+      {scale.domain().map((category, i) => (
+        <g key={category}>
+          <text x={x + 25} y={y + 16 + 20 * i} dominantBaseline="middle" fontSize={12}>
+            {category}
+          </text>
+          <circle r={5} cx={x + 15} cy={y + 15 + 20 * i} fill={scale(category)} />
+        </g>
+      ))}
+    </g>
   )
 }
